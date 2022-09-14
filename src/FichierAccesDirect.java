@@ -11,7 +11,7 @@ public class FichierAccesDirect
     {
     public static void main(String[] args) throws IOException
         {
-        File fichier = new File("employe.bat") ;
+        File fichier = new File("employe.bin") ;
 
         RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
         int numero = 0 ;
