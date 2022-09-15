@@ -27,55 +27,104 @@ public class ExerciceFormatif {
         File fichier = new File("employe.bin") ;
 
             RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
-            int cle = 0 ;
-            //String nom="" ;
-            //String prenom="" ;
-            //int compteur = 1 ;
-            //double newSalaire = 0 ;
-            //boolean sortie = false ;
-            long adr =0;
+            int cle = 100 ;
+            long adr;
+            boolean sortie=false;
+            int choix=0;
 
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in)) ;
             //saisir
             System.out.println() ;   
-            adr = getAdresse(cle);
-            donnee.seek(adr++);
+            donnee.seek(getAdresse(cle));
             
-            donnee.writeInt(cle) ;
-            donnee.writeChar(' ') ;
+            donnee.writeLong(getAdresse(cle)); 
             System.out.println("Entrez le nom du nouvel employe") ;
             donnee.writeUTF(in.readLine()) ;
-            donnee.writeChar(' ') ;
             System.out.println("Entrez le prenom du nouvel employe") ;
             donnee.writeUTF(in.readLine()) ;
-            donnee.writeChar(' ') ;
-            System.out.println("Entrez le salaire du nouvel employe") ;
-            donnee.writeDouble(Double.parseDouble(in.readLine())) ;
-            donnee.close();
             
-            //afficher
-            System.out.println() ;  
-//            donnee.seek(0) ;
             
-            for (int i = 0 ; i < donnee.length() ; i++)
+            do
+            {       
+            do
                 {
                 try
                     {
-                        System.out.print(donnee.readInt()) ;
-                        System.out.print(donnee.readChar()) ;
-                        System.out.print(donnee.readUTF()) ;
-                        System.out.print(donnee.readChar()) ;
-                        System.out.print(donnee.readUTF()) ;
-                        System.out.print(donnee.readChar()) ;
-                        System.out.print(donnee.readDouble()) ;
-                        System.out.print(donnee.readChar()) ;                   
+                    System.out.println("Menu") ;
+                    System.out.println("====\n") ;
+                    System.out.println("1. Afficher les donnees") ;
+                    System.out.println("2. Ajouter un employe") ;
+                    System.out.println("3. Quitter") ;      
+                    choix = Integer.parseInt(in.readLine()) ;
                     }
-                catch(EOFException e)
+                catch(NumberFormatException e)
                     {}
                 }
-                                
-            System.out.println() ;
-                           
-            
+            while(choix < 1 || choix > 3) ;
+
+            switch(choix)
+                {
+                case 1 :
+                    {
+                    System.out.println() ;  
+                        
+                    donnee.seek(0) ;
+                    
+                    for (int i = 0 ; i*52 < donnee.length() ; i++)
+                        {
+                        try
+                            {
+                                System.out.print(donnee.readLong()) ;
+                                System.out.print(donnee.readUTF()) ;
+                                System.out.print(donnee.readUTF()) ;
+                            }
+                        catch(EOFException e)
+                            {}
+                        }
+                                        
+                    System.out.println() ;
+                    }               
+                break ;
+
+ 
+    
+                case 2 :
+                    {
+                    System.out.println() ;  
+                        
+                    donnee.seek(getAdresse(cle)) ;
+                    cle += 100 ;
+                    
+                    try
+                        {
+                            donnee.writeLong(getAdresse(cle));
+                            System.out.println("Entrez le nom du nouvel employe") ;
+                            donnee.writeUTF(in.readLine()) ;
+                            System.out.println("Entrez le prenom du nouvel employe") ;
+                            donnee.writeUTF(in.readLine()) ;
+                        }
+                    catch(EOFException e)
+                        {}
+                                        
+                    System.out.println() ;
+                    }               
+                break ;
+
+                case 3 :
+                
+                case 5 :
+                    {
+                    System.out.println() ;  
+                    sortie = true ; 
+                    }               
+                break ; 
+                
+                }
+            }
+        while(sortie != true) ;
+    
+            donnee.close();
+        System.exit(0) ;    
     }
+
 }
