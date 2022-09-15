@@ -23,28 +23,23 @@ public class ExerciceFormatif {
 
     public static void main(String[] args) throws IOException
     {
+        File fichier = new File("emp.bin") ;
 
-        File fichier = new File("employe.bin") ;
-
-            RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
-            int cle = 100 ;
-            long adr;
-            boolean sortie=false;
-            int choix=0;
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in)) ;
-            //saisir
-            System.out.println() ;   
-            donnee.seek(getAdresse(cle));
-            
-            donnee.writeLong(getAdresse(cle)); 
-            System.out.println("Entrez le nom du nouvel employe") ;
-            donnee.writeUTF(in.readLine()) ;
-            System.out.println("Entrez le prenom du nouvel employe") ;
-            donnee.writeUTF(in.readLine()) ;
-            
-            
-            do
+        RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
+        int numero = 0 ;
+        int choix = 0 ;
+        int compteur = 100 ;
+        double moyenne = 0 ;
+        double newSalaire = 0 ;
+        boolean sortie = false ;
+        
+        donnee.writeInt(compteur) ;
+        donnee.writeUTF("Tavares") ;
+        donnee.writeUTF("Antonio") ;
+        donnee.writeDouble(5500.00) ;
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in)) ;
+        do
             {       
             do
                 {
@@ -53,30 +48,39 @@ public class ExerciceFormatif {
                     System.out.println("Menu") ;
                     System.out.println("====\n") ;
                     System.out.println("1. Afficher les donnees") ;
-                    System.out.println("2. Ajouter un employe") ;
-                    System.out.println("3. Quitter") ;      
+                    System.out.println("2. Calculer le salaire moyens") ;
+                    System.out.println("3. Ajouter un employe") ;
+                    System.out.println("4. Modifier le salaire d'un employe") ;
+                    System.out.println("5. Quitter") ;      
                     choix = Integer.parseInt(in.readLine()) ;
                     }
                 catch(NumberFormatException e)
                     {}
                 }
-            while(choix < 1 || choix > 3) ;
+            while(choix < 1 || choix > 5) ;
 
             switch(choix)
                 {
                 case 1 :
                     {
                     System.out.println() ;  
-                        
                     donnee.seek(0) ;
                     
-                    for (int i = 0 ; i*52 < donnee.length() ; i++)
+                    //for (int i = 0 ; i < donnee.length() ; i++)
+                    int i=0;
+                    while(i<donnee.length())
                         {
                         try
                             {
-                                System.out.print(donnee.readLong()) ;
+                                System.out.print(donnee.readInt()) ;
+                                System.out.print(" ") ;
                                 System.out.print(donnee.readUTF()) ;
+                                System.out.print(" ") ;
                                 System.out.print(donnee.readUTF()) ;
+                                System.out.print(" ") ;
+                                System.out.print(donnee.readDouble()) ;
+                                System.out.print("\n") ;
+                                i=i*52;
                             }
                         catch(EOFException e)
                             {}
@@ -91,17 +95,49 @@ public class ExerciceFormatif {
                 case 2 :
                     {
                     System.out.println() ;  
+                    moyenne = 0 ;   
+                    donnee.seek(0) ;
+                    
+                    for (int i = 0 ; i < compteur ; i++)
+                        {
+    
+                        try
+                            {
+                                donnee.readInt() ;
+                                donnee.readChar() ;
+                                donnee.readUTF();
+                                donnee.readChar() ;
+                                donnee.readUTF() ;
+                                donnee.readChar() ;
+                                moyenne += donnee.readDouble() ;
+                                donnee.readChar() ;                 
+                            }
+                        catch(EOFException e)
+                            {}
+                        }
+                    
+                    System.out.println("La moyenne des salaires est de : " + (moyenne/compteur)) ;
+                                        
+                    System.out.println() ;
+                    }               
+                break ;
+    
+                case 3 :
+                    {
+                    System.out.println() ;  
                         
-                    donnee.seek(getAdresse(cle)) ;
-                    cle += 100 ;
+                    donnee.seek(getAdresse(compteur)) ;
+                    compteur += 100 ;
                     
                     try
                         {
-                            donnee.writeLong(getAdresse(cle));
+                            donnee.writeInt(compteur) ;
                             System.out.println("Entrez le nom du nouvel employe") ;
                             donnee.writeUTF(in.readLine()) ;
                             System.out.println("Entrez le prenom du nouvel employe") ;
                             donnee.writeUTF(in.readLine()) ;
+                            System.out.println("Entrez le salaire du nouvel employe") ;
+                            donnee.writeDouble(Double.parseDouble(in.readLine())) ;
                         }
                     catch(EOFException e)
                         {}
@@ -110,7 +146,58 @@ public class ExerciceFormatif {
                     }               
                 break ;
 
-                case 3 :
+                case 4 :
+                    {
+                    System.out.println() ;  
+                        
+                    donnee.seek(0) ;
+                    
+                    do
+                        {
+                        System.out.println("Entrez le numéro de l'employé a qui vous voulez change le salaire") ;
+                        numero = Integer.parseInt(in.readLine()) ;
+                        }
+                    while(numero < 0 || numero > compteur) ;
+                    
+                    System.out.println("Entrez le montant du nouveau salaire") ;
+                    newSalaire = Double.parseDouble(in.readLine()) ;
+                    
+                    int numDonnee = 0 ;
+                    
+                    try
+                        {
+                        for (int i = 0 ; i < compteur ; i++)
+                            {
+                            numDonnee = donnee.readInt() ;  
+                                    
+                            if(numero == numDonnee)
+                                {
+                                donnee.readChar() ;
+                                donnee.readUTF() ;
+                                donnee.readChar();
+                                donnee.readUTF() ;
+                                donnee.readChar() ;
+                                donnee.writeDouble(newSalaire) ;
+                                donnee.readChar() ; 
+                                }
+                            else
+                                {
+                                donnee.readChar() ;
+                                donnee.readUTF() ;
+                                donnee.readChar();
+                                donnee.readUTF() ;
+                                donnee.readChar() ;
+                                donnee.readDouble() ;
+                                donnee.readChar() ;                             
+                                }   
+                            }           
+                        }
+                    catch(EOFException e)
+                        {}
+                                        
+                    System.out.println() ;
+                    }               
+                break ;
                 
                 case 5 :
                     {
