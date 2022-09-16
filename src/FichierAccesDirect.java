@@ -11,7 +11,7 @@ public class FichierAccesDirect
     {
     public static void main(String[] args) throws IOException
         {
-        File fichier = new File("emp.bin") ;
+        File fichier = new File("emp123.bin") ;
 
         RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
         int numero = 0 ;
@@ -29,7 +29,7 @@ public class FichierAccesDirect
         donnee.writeChar(' ') ;
         donnee.writeDouble(5500.00) ;
         donnee.writeChar('\n') ;
-        
+        System.out.println(donnee.getFilePointer()) ;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in)) ;
         
 
