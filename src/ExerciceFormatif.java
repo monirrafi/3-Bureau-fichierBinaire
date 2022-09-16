@@ -66,9 +66,9 @@ public class ExerciceFormatif {
                     System.out.println() ;  
                     donnee.seek(0) ;
                     
-                    //for (int i = 0 ; i < donnee.length() ; i++)
-                    int i=0;
-                    while(i<donnee.length())
+                    for (int i = 0 ; i < donnee.length() ; i++)
+                    //int i=0, n=0;
+                    //while(n<donnee.length())
                         {
                         try
                             {
@@ -80,7 +80,8 @@ public class ExerciceFormatif {
                                 System.out.print(" ") ;
                                 System.out.print(donnee.readDouble()) ;
                                 System.out.print("\n") ;
-                                i=i*52;
+                                //i++;
+                                //n=i*52;
                             }
                         catch(EOFException e)
                             {}
@@ -126,7 +127,7 @@ public class ExerciceFormatif {
                     {
                     System.out.println() ;  
                         
-                    donnee.seek(getAdresse(compteur)) ;
+                    donnee.seek(0) ;
                     compteur += 100 ;
                     
                     try
