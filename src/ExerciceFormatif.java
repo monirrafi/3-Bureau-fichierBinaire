@@ -1,6 +1,10 @@
 import java.io.* ;
 public class ExerciceFormatif {
+
+            static RandomAccessFile donnee;
             static final int TAILLE_ENREG = 56;
+            static File fichier = new File("emp.bin") ;
+ 
             public static String cadreMot(String mot, int size){
                 String sortie="";
                 if(mot.length() >= size){
@@ -26,19 +30,96 @@ public class ExerciceFormatif {
                     long l = 100*lng/TAILLE_ENREG;
                     return (int) l;
             }
+
+            public static void afficher() throws IOException{
+                int num;
+                String nom, prenom;
+                double salaire;
+                donnee = new RandomAccessFile(fichier, "rw") ;
+                System.out.println() ;  
+                            
+                try
+                {
+                donnee.seek(0) ;
+                
+                for (int i = 0 ; i < donnee.length() ; i++)
+                    {
+                            
+                            donnee.seek(i*TAILLE_ENREG);
+
+                            num = donnee.readInt();
+                            nom = donnee.readUTF();
+                            prenom = donnee.readUTF();
+                            salaire = donnee.readDouble();
+                            
+                            if(num != -1){
+                            System.out.print(num) ;
+                            System.out.print(" ") ;
+                            System.out.print(nom) ;
+                            System.out.print(" ") ;
+                            System.out.print(prenom) ;
+                            System.out.print(" ") ;
+                            System.out.print(salaire) ;
+                            System.out.print("\n") ;
+                            }
+                        }
+                    }
+                    catch(EOFException e)
+                        {}
+                                    
+                System.out.println() ;
+
+
+            }
+            public static void afficherUn(int num) throws IOException{
+                
+                String nom, prenom;
+                double salaire;
+                donnee = new RandomAccessFile(fichier, "rw") ;
+                System.out.println() ;  
+                            
+                try
+                {
+                            
+                            donnee.seek(getAdresse(num));
+
+                            num = donnee.readInt();
+                            nom = donnee.readUTF();
+                            prenom = donnee.readUTF();
+                            salaire = donnee.readDouble();
+                            
+                            if(num != -1){
+                            System.out.print(num) ;
+                            System.out.print(" ") ;
+                            System.out.print(nom) ;
+                            System.out.print(" ") ;
+                            System.out.print(prenom) ;
+                            System.out.print(" ") ;
+                            System.out.print(salaire) ;
+                            System.out.print("\n") ;
+                            }
+                        
+                    }
+                    catch(EOFException e)
+                        {}
+                                    
+                System.out.println() ;
+
+
+            }
         
         public static void main(String[] args) throws IOException
             {
-            File fichier = new File("emp.bin") ;
             
-            RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
-            int numero = 0 ;
-            int choix = 0 ;
-            int compteur = 100 ;
-            double moyenne = 0 ;
-            double newSalaire = 0 ;
-            boolean sortie = false ;
+                int numero = 0 ;
+                int choix = 0 ;
+                int compteur = 100 ;
+                double moyenne = 0 ;
+                double newSalaire = 0 ;
+                boolean sortie = false ;
             
+            
+            donnee = new RandomAccessFile(fichier, "rw") ;
             donnee.seek(getAdresse(compteur)) ;
             donnee.writeInt(compteur) ;
             donnee.writeUTF(cadreMot("Tavares",20)) ;
@@ -63,7 +144,8 @@ public class ExerciceFormatif {
                         System.out.println("2. Calculer le salaire moyens") ;
                         System.out.println("3. Ajouter un employe") ;
                         System.out.println("4. Modifier le salaire d'un employe") ;
-                        System.out.println("5. Quitter") ;
+                        System.out.println("5. Suprimer un employe") ;
+                        System.out.println("6. Quitter") ;
                         System.out.println("===========================================================") ;  
                         System.out.print("Entrez votre choix : ") ;
          
@@ -72,35 +154,13 @@ public class ExerciceFormatif {
                     catch(NumberFormatException e)
                         {}
                     }
-                while(choix < 1 || choix > 5) ;
+                while(choix < 1 || choix > 6) ;
     
                 switch(choix)
                     {
                     case 1 :
                         {
-                        System.out.println() ;  
-                            
-                        donnee.seek(0) ;
-                        
-                        for (int i = 0 ; i < donnee.length() ; i++)
-                            {
-                            try
-                                {
-                                    donnee.seek(i*TAILLE_ENREG);
-                                    System.out.print(donnee.readInt()) ;
-                                    System.out.print(" ") ;
-                                    System.out.print(donnee.readUTF()) ;
-                                    System.out.print(" ") ;
-                                    System.out.print(donnee.readUTF()) ;
-                                    System.out.print(" ") ;
-                                    System.out.print(donnee.readDouble()) ;
-                                    System.out.print("\n") ;
-                                }
-                            catch(EOFException e)
-                                {}
-                            }
-                                            
-                        System.out.println() ;
+                            afficher();
                         }               
                     break ;
     
@@ -187,8 +247,43 @@ public class ExerciceFormatif {
                         System.out.println() ;
                         }               
                     break ;
-                    
                     case 5 :
+                        {
+                        System.out.println() ;  
+                            
+                        donnee.seek(0) ;
+                        int cond =0;
+                        do
+                            {
+                            System.out.println("Entrez le numéro de l'employé a qui vous voulez suprimer") ;
+                            numero = Integer.parseInt(in.readLine()) ;
+                            if(getAdresse(numero) == -1){
+                                System.out.println("Le numero du employe n'existe pas !!!!") ;
+                            }else{
+                                cond=1;
+                            }
+                            }
+                        while(cond ==0) ;
+                        
+                        
+                        
+                        try {
+                            //donnee = new RandomAccessFile(fichier, "rw") ;
+                            donnee.seek(getAdresse(numero)); 
+                            donnee.writeInt(-1);
+                            donnee.writeUTF(cadreMot(" ", 20));
+                            donnee.writeUTF(cadreMot(" ", 20));
+                            donnee.writeInt(0);
+                        } catch (IOException e) {
+                            System.out.println("Gros probléme! " + e.getMessage());
+                        } finally {
+                            //donnee.close();
+                        }
+                        System.out.println() ;
+                        }               
+                    break ;
+                    
+                    case 6 :
                         {
                         System.out.println() ;  
                         sortie = true ; 
