@@ -1,25 +1,37 @@
-/*********************************************************
-
-    Sur les fichiers  a accès aléatoire
-
-/********************************************************/
-
 import java.io.* ;
-//import java.util.* ;
-
 public class FichierBinaireDemo
     {
-        static final int TAILLE_ENREG = 52;
-
+        static final int TAILLE_ENREG = 56;
+        public static String cadreMot(String mot, int size){
+            String sortie="";
+            if(mot.length() >= size){
+                sortie = mot.substring(0,size);
+            }else{
+                sortie=mot;
+                for(int i=0;i<20-mot.length();i++){
+                    sortie =sortie + " ";
+                }
+                
+            }
+            return sortie;
+        }
+        
         public static long getAdresse(int cle) {
-            long adr = (cle/100-1)* TAILLE_ENREG;
+            long adr=-1;
+            if(cle%100 == 0){
+                adr = (cle/100-1)* TAILLE_ENREG;
+            }
             return adr;
+        }
+        public static int getDernierCle(long lng) {
+                long l = 100*lng/TAILLE_ENREG;
+                return (int) l;
         }
     
     public static void main(String[] args) throws IOException
         {
-        File fichier = new File("emp123.bin") ;
-
+        File fichier = new File("emp.bin") ;
+        
         RandomAccessFile donnee = new RandomAccessFile(fichier, "rw") ;
         int numero = 0 ;
         int choix = 0 ;
@@ -30,8 +42,8 @@ public class FichierBinaireDemo
         
         donnee.seek(getAdresse(compteur)) ;
         donnee.writeInt(compteur) ;
-        donnee.writeUTF("Tavares") ;
-        donnee.writeUTF("Antonio") ;
+        donnee.writeUTF(cadreMot("Tavares",20)) ;
+        donnee.writeUTF(cadreMot("Antonio",20)) ;
         donnee.writeDouble(5500.00) ;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in)) ;
         
@@ -75,7 +87,7 @@ public class FichierBinaireDemo
                         {
                         try
                             {
-                                donnee.seek(i*52);
+                                donnee.seek(i*TAILLE_ENREG);
                                 System.out.print(donnee.readInt()) ;
                                 System.out.print(" ") ;
                                 System.out.print(donnee.readUTF()) ;
@@ -99,26 +111,25 @@ public class FichierBinaireDemo
                     {
                     System.out.println() ;  
                     moyenne = 0 ;   
-                    
-                    for (int i = 0 ; i < compteur ; i++)
+                    int cpt=0;
+                    for (int i = 0 ; i < donnee.length() ; i++)
                         {
     
                         try
                             {
-                                donnee.seek(i*52) ;
+                                donnee.seek(i*TAILLE_ENREG) ;
                                 donnee.readInt() ;
                                 donnee.readUTF();
-                                donnee.readChar() ;
                                 donnee.readUTF() ;
-                                donnee.readChar() ;
                                 moyenne += donnee.readDouble() ;
-                                donnee.readChar() ;                 
+                                cpt++;
+                           
                             }
                         catch(EOFException e)
                             {}
                         }
                     
-                    System.out.println("La moyenne des salaires est de : " + (moyenne/compteur)) ;
+                    System.out.println("La moyenne des salaires est de : " + (moyenne/cpt)) ;
                                         
                     System.out.println() ;
                     }               
@@ -127,28 +138,23 @@ public class FichierBinaireDemo
                 case 3 :
                     {
                     System.out.println() ;  
-                        
+                    //compteur += 100 ;
                     donnee.seek(donnee.length()) ;
-                    compteur += 1 ;
-                    
                     try
                         {
-                            donnee.writeInt(compteur) ;
-                            donnee.writeChar(' ') ;
+                            donnee.writeInt(getDernierCle(donnee.length())+100) ;
                             System.out.println("Entrez le nom du nouvel employe") ;
-                            donnee.writeUTF(in.readLine()) ;
-                            donnee.writeChar(' ') ;
+                            donnee.writeUTF(cadreMot(in.readLine(),20)) ;
                             System.out.println("Entrez le prenom du nouvel employe") ;
-                            donnee.writeUTF(in.readLine()) ;
-                            donnee.writeChar(' ') ;
+                            donnee.writeUTF(cadreMot(in.readLine(),20)) ;
                             System.out.println("Entrez le salaire du nouvel employe") ;
                             donnee.writeDouble(Double.parseDouble(in.readLine())) ;
-                            donnee.writeChar('\n') ;                    
                         }
                     catch(EOFException e)
                         {}
                                         
                     System.out.println() ;
+                    System.out.println(getAdresse(compteur));
                     }               
                 break ;
 
@@ -163,40 +169,18 @@ public class FichierBinaireDemo
                         System.out.println("Entrez le numéro de l'employé a qui vous voulez change le salaire") ;
                         numero = Integer.parseInt(in.readLine()) ;
                         }
-                    while(numero < 0 || numero > compteur) ;
+                    while(getAdresse(numero) ==-1) ;
                     
                     System.out.println("Entrez le montant du nouveau salaire") ;
                     newSalaire = Double.parseDouble(in.readLine()) ;
-                    
-                    int numDonnee = 0 ;
-                    
+                    donnee.seek(getAdresse(numero));
+                   
                     try
                         {
-                        for (int i = 0 ; i < compteur ; i++)
-                            {
-                            numDonnee = donnee.readInt() ;  
-                                    
-                            if(numero == numDonnee)
-                                {
-                                donnee.readChar() ;
-                                donnee.readUTF() ;
-                                donnee.readChar();
-                                donnee.readUTF() ;
-                                donnee.readChar() ;
-                                donnee.writeDouble(newSalaire) ;
-                                donnee.readChar() ; 
-                                }
-                            else
-                                {
-                                donnee.readChar() ;
-                                donnee.readUTF() ;
-                                donnee.readChar();
-                                donnee.readUTF() ;
-                                donnee.readChar() ;
-                                donnee.readDouble() ;
-                                donnee.readChar() ;                             
-                                }   
-                            }           
+                            donnee.readInt();
+                            donnee.readUTF() ;
+                            donnee.readUTF() ;
+                            donnee.writeDouble(newSalaire) ;
                         }
                     catch(EOFException e)
                         {}
